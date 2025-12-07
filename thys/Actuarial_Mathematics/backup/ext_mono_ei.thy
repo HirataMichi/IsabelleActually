@@ -1,5 +1,5 @@
-theory DISCARDED_ext_mono_ei
-  imports Preliminaries "Wlog.Wlog"
+theory ext_mono_ei
+  imports Preliminaries_AC "Wlog.Wlog"
 begin
 
 declare[[show_types]]
