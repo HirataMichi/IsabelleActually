@@ -2,8 +2,9 @@
 This is the development repository for "Actuarial Mathematics" and related entries in the Archive of Formal Proofs of Isabelle.
 
 ## Requirements
-- [Isabelle-2025-1-RC3](https://isabelle.in.tum.de/website-Isabelle2025-1-RC3)
-- Corresponding Archive of Formal Proofs (https://foss.heptapod.net/isa-afp/afp-devel/-/commit/3af26ffddf1b)
+- [Isabelle-2025-1-RC4](https://isabelle.in.tum.de/website-Isabelle2025-1-RC4)
+- Corresponding Archive of Formal Proofs  
+  https://foss.heptapod.net/isa-afp/afp-2021-1
 
 ## Notices
 - These entries are under development and subject to change.
