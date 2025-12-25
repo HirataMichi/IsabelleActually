@@ -590,9 +590,11 @@ proof -
     by (rewrite val_defer_cont_whole_life_ann.APV_calc; simp)
 qed
 
-proposition a'_whole_life_calc: "$a'_{x} = (LBINT t:{0..}. $v.^t * $p_{t&x})"
+proposition
+  a'_whole_life_set_integrable: "set_integrable lborel {0..} (\<lambda>t. $v.^t * $p_{t&x})" and
+  a'_whole_life_calc: "$a'_{x} = (LBINT t:{0..}. $v.^t * $p_{t&x})"
   if "i > 0" "x < $\<psi>" for x::real
-  using that a'_defer_whole_life_calc by simp
+  using that a'_defer_whole_life_set_integrable a'_defer_whole_life_calc by simp+
 
 definition
   APV_defer_cont_term_life_ann :: "real \<Rightarrow> real \<Rightarrow> real \<Rightarrow> real" (\<open>$a'''_{_\<bar>_;_\<rceil>}\<close> [0,0,0] 200)
@@ -616,9 +618,11 @@ proof -
     by (rewrite val_defer_cont_term_life_ann.APV_calc; simp)
 qed
 
-proposition a'_term_life_calc: "$a'_{x;n\<rceil>} = (LBINT t:{0..n}. $v.^t * $p_{t&x})"
+proposition
+  a'_term_life_set_integrable: "set_integrable lborel {0..n} (\<lambda>t. $v.^t * $p_{t&x})" and
+  a'_term_life_calc: "$a'_{x;n\<rceil>} = (LBINT t:{0..n}. $v.^t * $p_{t&x})"
   if "n \<ge> 0" "x < $\<psi>" for n x :: real
-  using that a'_defer_term_life_calc by simp
+  using that a'_defer_term_life_set_integrable[of 0] a'_defer_term_life_calc by simp+
 
 lemma a'_defer_whole_term_life_beyond: "$a'_{f\<bar>x} = $a'_{f\<bar>x;n\<rceil>}"
   if "x+f+n \<ge> $\<psi>" "f \<ge> 0" "n \<ge> 0" "i > 0" "x < $\<psi>" for f n x :: real

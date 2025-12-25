@@ -340,9 +340,11 @@ proof -
     unfolding PV_defer_cont_perp_ann_def using that
     by (rewrite defer_cont_perp_ann.PV_calc; simp)
 qed
-(* TODO : add a'_prep_set_integrable; SO DO others *)
-proposition a'_perp_calc: "$a'_\<infinity>\<rceil> = (LBINT t:{0..}. $v.^t)" if "i > 0"
-  using that a'_defer_perp_calc by simp
+
+proposition
+  a'_perp_set_integrable: "set_integrable lborel {0..} (\<lambda>t. $v.^t)" and
+  a'_perp_calc: "$a'_\<infinity>\<rceil> = (LBINT t:{0..}. $v.^t)" if "i > 0"
+  using that a'_defer_perp_set_integrable a'_defer_perp_calc by simp+
 
 definition PV_defer_cont_term_ann :: "real \<Rightarrow> real \<Rightarrow> real" (\<open>$a'''_{_\<bar>_\<rceil>}\<close> [0,0] 200)
   where "$a'_{f\<bar>n\<rceil>} \<equiv> annuity.PV i (defer_cont_term_ann.abg f n)"
@@ -363,8 +365,11 @@ proof -
     by (rewrite defer_cont_term_ann.PV_calc; simp)
 qed
 
-proposition a'_term_calc: "$a'_n\<rceil> = (LBINT t:{0..n}. $v.^t)" if "n \<ge> 0"
-  using that a'_defer_term_calc by simp
+proposition
+  a'_term_set_integrable: "set_integrable lborel {0..n} (\<lambda>t. $v.^t)" and
+  a'_term_calc: "$a'_n\<rceil> = (LBINT t:{0..n}. $v.^t)"
+  if "n \<ge> 0"
+  using that a'_defer_term_set_integrable[of 0] a'_defer_term_calc by simp+
 
 end
 
