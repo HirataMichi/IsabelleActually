@@ -339,6 +339,11 @@ sublocale val_life_ann \<subseteq> val i l f ab tp
 context val_life_ann
 begin
 
+lemma ennAPV_PV_abg:
+  assumes "x < $\<psi>"
+  shows "ennAPV x = \<integral>\<^sup>+\<xi>. (\<integral>\<^sup>+t\<in>{f..<T x \<xi>}. $v.^t \<partial>(IM abg)) \<partial>(\<MM> \<downharpoonright> alive x)"
+  unfolding ennAPV_def by (auto intro!: nn_integral_cong simp add: PV_abg)
+
 lemma ennAPV_nn_integral_interval_measure_abg:
   assumes "x < $\<psi>"
   shows "ennAPV x = (\<integral>\<^sup>+t\<in>{f..}. $v.^t * $p_{t&x} \<partial>(IM abg))"
