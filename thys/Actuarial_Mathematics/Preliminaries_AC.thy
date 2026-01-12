@@ -1668,8 +1668,9 @@ qed
 subsection \<open>Interchange of Differentiation and Lebesgue Integration\<close>
 
 definition measurable_extension :: "'a measure \<Rightarrow> 'b measure \<Rightarrow> ('a \<Rightarrow> 'b) \<Rightarrow> 'a \<Rightarrow> 'b" where
-  "measurable_extension M N f \<equiv>
-    (SOME g. g \<in> M \<rightarrow>\<^sub>M N \<and> (AE x in M. f x = g x))"
+  "measurable_extension M N f \<equiv> (SOME g. g \<in> M \<rightarrow>\<^sub>M N \<and> (AE x in M. f x = g x))"
+  \<comment> \<open>The term \<open>measurable_extension\<close> is proposed by Reynald Affeldt.\<close>
+  \<comment> \<open>This function is used to make an almost-everywhere-defined function measurable.\<close>
 
 lemma measurable_extension_def2:
   "measurable_extension M N f = (SOME g. g \<in> M \<rightarrow>\<^sub>M N \<and> (\<exists>S\<in>(null_sets M). {x \<in> space M. f x \<noteq> g x} \<subseteq> S))"
@@ -1691,12 +1692,14 @@ proof -
 qed
 
 lemma measurable_extension_measurable'[measurable]:
- "f \<in>  M \<rightarrow>\<^sub>M N \<Longrightarrow> measurable_extension M N f \<in> M \<rightarrow>\<^sub>M N"
-  by(auto intro!: measurable_extension_measurable)
+  assumes "f \<in>  M \<rightarrow>\<^sub>M N"
+  shows "measurable_extension M N f \<in> M \<rightarrow>\<^sub>M N"
+  using assms by(auto intro!: measurable_extension_measurable)
 
 lemma measurable_extensionI'[simp]:
- "f \<in>  M \<rightarrow>\<^sub>M N \<Longrightarrow> AE x in M. f x = measurable_extension M N f x"
-  by(auto intro!: measurable_extensionI)
+  assumes "f \<in>  M \<rightarrow>\<^sub>M N"
+  shows "AE x in M. f x = measurable_extension M N f x"
+  using assms by(auto intro!: measurable_extensionI)
 
 corollary measurable_measurable_extension_AE:
   fixes f
@@ -1707,20 +1710,6 @@ corollary measurable_measurable_extension_AE:
 abbreviation borel_measurable_extension ::
   "'a measure \<Rightarrow> ('a \<Rightarrow> 'b::topological_space) \<Rightarrow> 'a \<Rightarrow> 'b" where
   "borel_measurable_extension M f \<equiv> measurable_extension M borel f"
-
-(*lemma
-  fixes f g
-  assumes "g \<in> borel_measurable M" "S \<in> null_sets M" "{x \<in> space M. f x \<noteq> g x} \<subseteq> S"
-  shows borel_measurable_extensionI: "AE x in M. f x = borel_measurable_extension M f x" and
-    borel_measurable_extensionI2: "AE x in M. g x = borel_measurable_extension M f x" and
-    borel_measurable_extension_measurable: "borel_measurable_extension M f \<in> borel_measurable M"
-*)
-
-(*corollary borel_measurable_measurable_extension_AE:
-  fixes f
-  assumes "f \<in> borel_measurable M"
-  shows "AE x in M. f x = borel_measurable_extension M f x"
-  using assms measurable_measurable_extension_AE by auto*)
 
 definition set_borel_measurable_extension ::
   "'a measure \<Rightarrow> 'a set \<Rightarrow> ('a \<Rightarrow> 'b::topological_space) \<Rightarrow> 'a \<Rightarrow> 'b"
@@ -1801,7 +1790,7 @@ proof -
       thus "(\<lambda>n. (f (r + d (n+m)) x - f r x) / d (n+m)) \<longlonglongrightarrow> Df r x"
         by (rule LIMSEQ_ignore_initial_segment[where k=m])
     qed
-     have Df_eq:
+    have Df_eq:
       "Df r = (\<lambda>x. indicator ?CN x * lim (\<lambda>n. (f (r + d (n+m)) x - f r x) / d (n+m)))"
     proof
       fix x
@@ -1845,7 +1834,7 @@ proof -
             hence rtd_ab: "r + t * d (n+m) \<in> {a<..<b}"
               using r_ab rd_ab[of n]
               by simp (smt (verit, ccfv_threshold) mult_less_cancel_left mult_less_cancel_right2)
-             (* TODO: fix this proof *)
+                (* TODO: fix this proof *)
             have "d (n+m) * deriv (\<lambda>s. f s x) (r + t * (d (n+m))) =
               d (n+m) * Df (r + t * (d (n+m))) x"
             proof -
@@ -1901,7 +1890,7 @@ proof -
             using N_null eventually_ae_filter by blast
           thus "AE x in M. Df r x = borel_measurable_extension M (\<lambda>y. deriv (\<lambda>s. f s y) r) x" and
             "borel_measurable_extension M (\<lambda>y. deriv (\<lambda>s. f s y) r) \<in> borel_measurable M"
-           by(auto intro!: measurable_extensionI2[OF _ *] measurable_extension_measurable[OF _ *])
+            by(auto intro!: measurable_extensionI2[OF _ *] measurable_extension_measurable[OF _ *])
         qed
         thus ?thesis using Df_msr by (intro integral_cong_AE; simp)
       qed
@@ -2205,7 +2194,7 @@ proof -
                     = indicator {..<y} x * indicator {0..} y * indicator {0..} x"
         by(auto simp: indicator_def)
       thus ?thesis
-        by(subst nn_integral_multc[symmetric]) (auto intro!: nn_integral_cong simp: nn_integral_distr )
+        by(subst nn_integral_multc[symmetric]) (auto intro!: nn_integral_cong simp: nn_integral_distr)
     qed
     finally show ?thesis by simp
   qed
@@ -2615,10 +2604,9 @@ proof -
   finally show ?thesis .
 qed
 
-(* The following does not need assumptions "A \<in> events" "prob A > 0" *)
 lemma random_variable_cond_prob_space:
-  assumes "A \<in> events" "prob A > 0"
-    and [measurable]: "random_variable borel X"
+  fixes A :: "'a set"
+  assumes [measurable]: "random_variable borel X"
   shows "X \<in> borel_measurable (M\<downharpoonright>A)"
   by(auto intro!: measurable_restrict_space1 simp: cond_prob_space_def cong: measurable_cong_sets)
 
@@ -3005,9 +2993,7 @@ proof -
         apply (rule differentiable_on_subset[of ln "{0<..}"])
          apply (rewrite differentiable_on_eq_field_differentiable_real)
         unfolding field_differentiable_def using DERIV_ln
-         apply (meson greaterThan_iff has_field_derivative_at_within)
-        apply simp
-        done
+        by (meson greaterThan_iff has_field_derivative_at_within) simp
       thus ?thesis unfolding comp_def by simp
     qed
     ultimately show ?thesis by (intro FTC_real_deriv_has_integral; simp add: assms)
@@ -3149,10 +3135,10 @@ next
   proof -
     fix dt :: real assume "dt > 0"
     hence [simp]: "sym_diff {t<..t + dt} {t..t + dt} = {t}" by force
-    have *:"prob (X -` {t<..t+dt} \<inter> space M) = \<integral>s. indicator {t<..t+dt} s * f s \<partial>lborel"
-      by (rule distributed_measure; simp add: assms)
+    have "(\<integral>s. indicator {t<..t+dt} s * f s \<partial>lborel) = prob (X -` {t<..t+dt} \<inter> space M)"
+      by (rule distributed_measure[THEN sym]; simp add: assms)
     hence "\<P>(x in M. X x \<in> {t <.. t+dt}) = (LBINT s:{t<..t+dt}. f s)"
-      by(auto intro!: arg_cong[where f=prob] simp: *[symmetric] set_lebesgue_integral_def)
+      by(auto intro!: arg_cong[where f=prob] simp: set_lebesgue_integral_def)
     moreover have "(LBINT s:{t<..t+dt}. f s) = (LBINT s:{t..t+dt}. f s)"
       by (rule set_integral_null_delta; force)
     ultimately show "\<P>(x in M. X x \<in> {t <.. t+dt}) = (LBINT s:{t..t+dt}. f s)" by simp
